@@ -40,6 +40,7 @@ public class TransactionData
 
     public void SetData(byte[] readData)
     {
+    try{
         int totlen = readData.length;
         int readIdx = 1; // length 4, stx 1
 
@@ -111,5 +112,8 @@ public class TransactionData
         readIdx += 30;
         if(totlen > 458)    // 458넘으면 extra data 있다고 판단
             System.arraycopy(readData, readIdx, extraData, 0, totlen-readIdx);
+        }catch( Exception e){
+
+        }
     }
 }

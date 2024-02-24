@@ -792,60 +792,126 @@ public class IntentShim extends CordovaPlugin {
         super.onActivityResult(requestCode, resultCode, intent);
         if (onActivityResultCallbackContext != null && intent != null)
         {
-            if((resultCode == RESULT_OK || resultCode == RESULT_CANCELED)&& intent != null
-            && intent.hasExtra("responseTelegram")){
+            if((resultCode == RESULT_OK || resultCode == RESULT_CANCELED) && intent != null && intent.hasExtra("responseTelegram")){
               byte[] recvByte = intent.getByteArrayExtra("responseTelegram");
               TransactionData trData = new TransactionData();
               trData.SetData(recvByte);
-              intent.putExtra("transactionCode", new String(trData.transactionCode));
-              intent.putExtra("operationCode", new String(trData.operationCode));
-              intent.putExtra("transferCode", new String(trData.transferCode));
-              intent.putExtra("transferType", new String(trData.transferType));
-              intent.putExtra("deviceNumber", new String(trData.deviceNumber));
-              intent.putExtra("companyInfo", new String(trData.companyInfo));
-              intent.putExtra("transferSerialNumber", new String(trData.transferSerialNumber));
-              intent.putExtra("status", new String(trData.status));
-              intent.putExtra("standardCode", new String(trData.standardCode));
-              intent.putExtra("cardCompanyCode", new String(trData.cardCompanyCode));
-              intent.putExtra("transferDate", new String(trData.transferDate));
-              intent.putExtra("cardType", new String(trData.cardType));
-              intent.putExtra("approvalNumber", new String(trData.approvalNumber));
-              intent.putExtra("transactionUniqueNumber", new String(trData.transactionUniqueNumber));
-              intent.putExtra("merchantNumber", new String(trData.merchantNumber));
-              intent.putExtra("IssuanceCode", new String(trData.IssuanceCode));
 
-              intent.putExtra("purchaseCompanyCode", new String(trData.purchaseCompanyCode));
-              intent.putExtra("workingKeyIndex", new String(trData.workingKeyIndex));
-              intent.putExtra("workingKey", new String(trData.workingKey));
-              intent.putExtra("balance", new String(trData.balance));
-              intent.putExtra("point1", new String(trData.point1));
-              intent.putExtra("point2", new String(trData.point2));
-              intent.putExtra("point3", new String(trData.point3));
-              try {
-                intent.putExtra("purchaseCompanyName", new String(trData.purchaseCompanyName,"EUC-KR"));
-                intent.putExtra("cardCategoryName", new String(trData.cardCategoryName,"EUC-KR"));
-                intent.putExtra("message1", new String(trData.message1,"EUC-KR"));
-                intent.putExtra("message2", new String(trData.message2,"EUC-KR"));
-                intent.putExtra("notice2", new String(trData.notice2,"EUC-KR"));
-                intent.putExtra("notice1", new String(trData.notice1, "EUC-KR"));
-              } catch (UnsupportedEncodingException e) {
-                throw new RuntimeException(e);
+             if(trData.transactionCode!==null && trData.transactionCode.length > 0){
+              intent.putExtra("transactionCode", new String(trData.transactionCode));
+             }
+             if(trData.operationCode!==null && trData.operationCode.length>0){
+              intent.putExtra("operationCode", new String(trData.operationCode));
               }
+             if(trData.transferCode!==null && trData.transferCode.length>0){
+              intent.putExtra("transferCode", new String(trData.transferCode));
+              }
+             if(trData.transferType!==null && trData.transferType.length>0){
+              intent.putExtra("transferType", new String(trData.transferType));
+              }
+             if(trData.deviceNumber!==null && trData.deviceNumber.length>0){
+              intent.putExtra("deviceNumber", new String(trData.deviceNumber));
+              }
+             if(trData.companyInfo!==null && trData.companyInfo.length>0){
+              intent.putExtra("companyInfo", new String(trData.companyInfo));
+              }
+             if(trData.transferSerialNumber!==null && trData.transferSerialNumber.length>0){
+              intent.putExtra("transferSerialNumber", new String(trData.transferSerialNumber));
+              }
+             if(trData.status!==null && trData.status.length>0){
+              intent.putExtra("status", new String(trData.status));
+              }
+             if(trData.standardCode!==null && trData.standardCode.length>0){
+              intent.putExtra("standardCode", new String(trData.standardCode));
+              }
+             if(trData.cardCompanyCode!==null && trData.cardCompanyCode.length>0){
+              intent.putExtra("cardCompanyCode", new String(trData.cardCompanyCode));
+              }
+             if(trData.transferDate!==null && trData.transferDate.length>0){
+              intent.putExtra("transferDate", new String(trData.transferDate));
+              }
+             if(trData.cardType!==null && trData.cardType.length>0){
+              intent.putExtra("cardType", new String(trData.cardType));
+              }
+             if(trData.approvalNumber!==null && trData.approvalNumber.length>0){
+              intent.putExtra("approvalNumber", new String(trData.approvalNumber));
+              }
+             if(trData.transactionUniqueNumber!==null && trData.transactionUniqueNumber.length>0){
+              intent.putExtra("transactionUniqueNumber", new String(trData.transactionUniqueNumber));
+              }
+             if(trData.merchantNumber!==null && trData.merchantNumber.length>0){
+              intent.putExtra("merchantNumber", new String(trData.merchantNumber));
+              }
+             if(trData.IssuanceCode!==null && trData.IssuanceCode.length>0){
+              intent.putExtra("IssuanceCode", new String(trData.IssuanceCode));
+              }
+
+             if(trData.purchaseCompanyCode!==null && trData.purchaseCompanyCode.length>0){
+              intent.putExtra("purchaseCompanyCode", new String(trData.purchaseCompanyCode));
+              }
+             if(trData.workingKeyIndex!==null && trData.workingKeyIndex.length>0){
+              intent.putExtra("workingKeyIndex", new String(trData.workingKeyIndex));
+              }
+             if(trData.workingKey!==null && trData.workingKey.length>0){
+              intent.putExtra("workingKey", new String(trData.workingKey));
+              }
+             if(trData.balance!==null && trData.balance.length>0){
+              intent.putExtra("balance", new String(trData.balance));
+              }
+             if(trData.point1!==null && trData.point1.length>0){
+              intent.putExtra("point1", new String(trData.point1));
+              }
+             if(trData.point2!==null && trData.point2.length>0){
+              intent.putExtra("point2", new String(trData.point2));
+              }
+             if(trData.point3!==null && trData.point3.length>0){
+              intent.putExtra("point3", new String(trData.point3));
+              }
+//               try {
+             if(trData.purchaseCompanyName!==null && trData.purchaseCompanyName.length>0){
+                intent.putExtra("purchaseCompanyName", new String(trData.purchaseCompanyName,"EUC-KR"));
+              }
+             if(trData.cardCategoryName!==null && trData.cardCategoryName.length>0){
+                intent.putExtra("cardCategoryName", new String(trData.cardCategoryName,"EUC-KR"));
+              }
+             if(trData.message1!==null && trData.message1.length>0){
+                intent.putExtra("message1", new String(trData.message1,"EUC-KR"));
+              }
+             if(trData.message2!==null && trData.message2.length>0){
+                intent.putExtra("message2", new String(trData.message2,"EUC-KR"));
+              }
+             if(trData.notice2!==null && trData.notice2.length>0){
+                intent.putExtra("notice2", new String(trData.notice2,"EUC-KR"));
+              }
+             if(trData.notice1!==null && trData.notice1.length>0){
+                intent.putExtra("notice1", new String(trData.notice1, "EUC-KR"));
+              }
+//               } catch (UnsupportedEncodingException e) {
+//                 throw new RuntimeException(e);
+//               }
+             if(trData.reserved!==null && trData.reserved.length>0){
               intent.putExtra("reserved", new String(trData.reserved));
+              }
+             if(trData.KSNETreserved!==null && trData.KSNETreserved.length>0){
               intent.putExtra("KSNETreserved", new String(trData.KSNETreserved));
+              }
+             if(trData.filler!==null && trData.filler.length>0){
               intent.putExtra("filler", new String(trData.filler));
+              }
+
               intent.putExtra("resultCode", resultCode);
               PluginResult result = new PluginResult(PluginResult.Status.OK, getIntentJson(intent));
               result.setKeepCallback(true);
               onActivityResultCallbackContext.sendPluginResult(result);
-            }else{
+            }
+            else
+            {
             intent.putExtra("requestCode", requestCode);
             intent.putExtra("resultCode", resultCode);
             PluginResult result = new PluginResult(PluginResult.Status.OK, getIntentJson(intent));
             result.setKeepCallback(true);
             onActivityResultCallbackContext.sendPluginResult(result);
             }
-
         }
         else if (onActivityResultCallbackContext != null)
         {
@@ -856,7 +922,6 @@ public class IntentShim extends CordovaPlugin {
             canceledResult.setKeepCallback(true);
             onActivityResultCallbackContext.sendPluginResult(canceledResult);
         }
-
     }
 
     private BroadcastReceiver newBroadcastReceiver() {
