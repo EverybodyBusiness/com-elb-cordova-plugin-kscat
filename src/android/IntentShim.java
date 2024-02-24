@@ -797,105 +797,105 @@ public class IntentShim extends CordovaPlugin {
               TransactionData trData = new TransactionData();
               trData.SetData(recvByte);
 
-             if(trData.transactionCode!==null && trData.transactionCode.length > 0){
+             if(trData.transactionCode != null && !trData.transactionCode.isEmpty()){
               intent.putExtra("transactionCode", new String(trData.transactionCode));
              }
-             if(trData.operationCode!==null && trData.operationCode.length>0){
+             if(trData.operationCode != null && !trData.operationCode.isEmpty()){
               intent.putExtra("operationCode", new String(trData.operationCode));
               }
-             if(trData.transferCode!==null && trData.transferCode.length>0){
+             if(trData.transferCode != null && !trData.transferCode.isEmpty()){
               intent.putExtra("transferCode", new String(trData.transferCode));
               }
-             if(trData.transferType!==null && trData.transferType.length>0){
+             if(trData.transferType != null && !trData.transferType.isEmpty()){
               intent.putExtra("transferType", new String(trData.transferType));
               }
-             if(trData.deviceNumber!==null && trData.deviceNumber.length>0){
+             if(trData.deviceNumber != null && !trData.deviceNumber.isEmpty()){
               intent.putExtra("deviceNumber", new String(trData.deviceNumber));
               }
-             if(trData.companyInfo!==null && trData.companyInfo.length>0){
+             if(trData.companyInfo != null && !trData.companyInfo.isEmpty()){
               intent.putExtra("companyInfo", new String(trData.companyInfo));
               }
-             if(trData.transferSerialNumber!==null && trData.transferSerialNumber.length>0){
+             if(trData.transferSerialNumber != null && !trData.transferSerialNumber.isEmpty()){
               intent.putExtra("transferSerialNumber", new String(trData.transferSerialNumber));
               }
-             if(trData.status!==null && trData.status.length>0){
+             if(trData.status != null && !trData.status.isEmpty()){
               intent.putExtra("status", new String(trData.status));
               }
-             if(trData.standardCode!==null && trData.standardCode.length>0){
+             if(trData.standardCode != null && !trData.standardCode.isEmpty()){
               intent.putExtra("standardCode", new String(trData.standardCode));
               }
-             if(trData.cardCompanyCode!==null && trData.cardCompanyCode.length>0){
+             if(trData.cardCompanyCode != null && !trData.cardCompanyCode.isEmpty()){
               intent.putExtra("cardCompanyCode", new String(trData.cardCompanyCode));
               }
-             if(trData.transferDate!==null && trData.transferDate.length>0){
+             if(trData.transferDate != null && !trData.transferDate.isEmpty()){
               intent.putExtra("transferDate", new String(trData.transferDate));
               }
-             if(trData.cardType!==null && trData.cardType.length>0){
+             if(trData.cardType != null && !trData.cardType.isEmpty()){
               intent.putExtra("cardType", new String(trData.cardType));
               }
-             if(trData.approvalNumber!==null && trData.approvalNumber.length>0){
+             if(trData.approvalNumber != null && !trData.approvalNumber.isEmpty()){
               intent.putExtra("approvalNumber", new String(trData.approvalNumber));
               }
-             if(trData.transactionUniqueNumber!==null && trData.transactionUniqueNumber.length>0){
+             if(trData.transactionUniqueNumber != null && !trData.transactionUniqueNumber.isEmpty()){
               intent.putExtra("transactionUniqueNumber", new String(trData.transactionUniqueNumber));
               }
-             if(trData.merchantNumber!==null && trData.merchantNumber.length>0){
+             if(trData.merchantNumber != null && !trData.merchantNumber.isEmpty()){
               intent.putExtra("merchantNumber", new String(trData.merchantNumber));
               }
-             if(trData.IssuanceCode!==null && trData.IssuanceCode.length>0){
+             if(trData.IssuanceCode != null && !trData.IssuanceCode.isEmpty()){
               intent.putExtra("IssuanceCode", new String(trData.IssuanceCode));
               }
 
-             if(trData.purchaseCompanyCode!==null && trData.purchaseCompanyCode.length>0){
+             if(trData.purchaseCompanyCode != null && !trData.purchaseCompanyCode.isEmpty()){
               intent.putExtra("purchaseCompanyCode", new String(trData.purchaseCompanyCode));
               }
-             if(trData.workingKeyIndex!==null && trData.workingKeyIndex.length>0){
+             if(trData.workingKeyIndex != null && !trData.workingKeyIndex.isEmpty()){
               intent.putExtra("workingKeyIndex", new String(trData.workingKeyIndex));
               }
-             if(trData.workingKey!==null && trData.workingKey.length>0){
+             if(trData.workingKey != null && !trData.workingKey.isEmpty()){
               intent.putExtra("workingKey", new String(trData.workingKey));
               }
-             if(trData.balance!==null && trData.balance.length>0){
+             if(trData.balance != null && !trData.balance.isEmpty()){
               intent.putExtra("balance", new String(trData.balance));
               }
-             if(trData.point1!==null && trData.point1.length>0){
+             if(trData.point1 != null && !trData.point1.isEmpty()){
               intent.putExtra("point1", new String(trData.point1));
               }
-             if(trData.point2!==null && trData.point2.length>0){
+             if(trData.point2 != null && !trData.point2.isEmpty()){
               intent.putExtra("point2", new String(trData.point2));
               }
-             if(trData.point3!==null && trData.point3.length>0){
+             if(trData.point3 != null && !trData.point3.isEmpty()){
               intent.putExtra("point3", new String(trData.point3));
               }
 //               try {
-             if(trData.purchaseCompanyName!==null && trData.purchaseCompanyName.length>0){
+             if(trData.purchaseCompanyName != null && !trData.purchaseCompanyName.isEmpty()){
                 intent.putExtra("purchaseCompanyName", new String(trData.purchaseCompanyName,"EUC-KR"));
               }
-             if(trData.cardCategoryName!==null && trData.cardCategoryName.length>0){
+             if(trData.cardCategoryName != null && !trData.cardCategoryName.isEmpty()){
                 intent.putExtra("cardCategoryName", new String(trData.cardCategoryName,"EUC-KR"));
               }
-             if(trData.message1!==null && trData.message1.length>0){
+             if(trData.message1 != null && !trData.message1.isEmpty()){
                 intent.putExtra("message1", new String(trData.message1,"EUC-KR"));
               }
-             if(trData.message2!==null && trData.message2.length>0){
+             if(trData.message2 != null && !trData.message2.isEmpty()){
                 intent.putExtra("message2", new String(trData.message2,"EUC-KR"));
               }
-             if(trData.notice2!==null && trData.notice2.length>0){
+             if(trData.notice2 != null && !trData.notice2.isEmpty()){
                 intent.putExtra("notice2", new String(trData.notice2,"EUC-KR"));
               }
-             if(trData.notice1!==null && trData.notice1.length>0){
+             if(trData.notice1 != null && !trData.notice1.isEmpty()){
                 intent.putExtra("notice1", new String(trData.notice1, "EUC-KR"));
               }
 //               } catch (UnsupportedEncodingException e) {
 //                 throw new RuntimeException(e);
 //               }
-             if(trData.reserved!==null && trData.reserved.length>0){
+             if(trData.reserved != null && !trData.reserved.isEmpty()){
               intent.putExtra("reserved", new String(trData.reserved));
               }
-             if(trData.KSNETreserved!==null && trData.KSNETreserved.length>0){
+             if(trData.KSNETreserved != null && !trData.KSNETreserved.isEmpty()){
               intent.putExtra("KSNETreserved", new String(trData.KSNETreserved));
               }
-             if(trData.filler!==null && trData.filler.length>0){
+             if(trData.filler != null && !trData.filler.isEmpty()){
               intent.putExtra("filler", new String(trData.filler));
               }
 
