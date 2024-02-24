@@ -866,7 +866,7 @@ public class IntentShim extends CordovaPlugin {
 //              if(trData.point3 != null && !isEmpty(trData.point3)){
               intent.putExtra("point3", new String(trData.point3));
 //               }
-//               try {
+              try {
 //              if(trData.purchaseCompanyName != null && !isEmpty(trData.purchaseCompanyName)){
                 intent.putExtra("purchaseCompanyName", new String(trData.purchaseCompanyName,"EUC-KR"));
 //               }
@@ -885,9 +885,9 @@ public class IntentShim extends CordovaPlugin {
 //              if(trData.notice1 != null && !isEmpty(trData.notice1)){
                 intent.putExtra("notice1", new String(trData.notice1, "EUC-KR"));
 //               }
-//               } catch (UnsupportedEncodingException e) {
+              } catch (UnsupportedEncodingException e) {
 //                 throw new RuntimeException(e);
-//               }
+              }
 //              if(trData.reserved != null && !isEmpty(trData.reserved)){
               intent.putExtra("reserved", new String(trData.reserved));
 //               }
