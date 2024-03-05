@@ -204,13 +204,13 @@ public class IntentShim extends CordovaPlugin {
   }
 
   private void makeTelegramReconnect() {
-//       ByteBuffer bb = ByteBuffer.allocate(4096);
+      Log.d(LOG_TAG, "kalen makeTelegramReconnect is called");
       ByteBuffer bb = ByteBuffer.allocate(50);
 
       bb.put((byte)0x02);                                                 // STX(2)
       bb.put("0007".getBytes());                                            // 전문길이(4)=  Command ID + filler + ETX + CR = 7
       bb.put("UC".getBytes());                                            // Command ID(2)
-      bb.put("000".getBytes());                                           // 여유필드(3)
+      bb.put("   ".getBytes());                                           // 여유필드(3)
       bb.put((byte)0x03);                                                 // ETX(1)
       bb.put((byte)0x0D);                                                 // CR(1)
 
