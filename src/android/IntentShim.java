@@ -856,7 +856,6 @@ public class IntentShim extends CordovaPlugin {
               trData.SetData(recvByte);
 
               intent.putExtra("transactionCode", new String(trData.transactionCode));
-              intent.putExtra("filler", new String(trData.filler));
               intent.putExtra("resultCode", resultCode);
               PluginResult result = new PluginResult(PluginResult.Status.OK, getIntentJson(intent));
               result.setKeepCallback(true);
