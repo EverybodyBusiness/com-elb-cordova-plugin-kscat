@@ -64,6 +64,9 @@ public class IntentShim extends CordovaPlugin {
     private Intent deferredIntent = null;
 
    byte[] mRequestTelegram;
+
+   byte[] mRequestTelegramReconnectKscat;
+
   public static byte FS  = (byte)0x1C;
 
   public static final int RESULT_OK = -1;
@@ -200,6 +203,27 @@ public class IntentShim extends CordovaPlugin {
     System.arraycopy(telegram                 , 0, mRequestTelegram, 4, telegram.length      );
   }
 
+  private void makeTelegramReconnect() {
+//       ByteBuffer bb = ByteBuffer.allocate(4096);
+      ByteBuffer bb = ByteBuffer.allocate(50);
+
+      bb.put((byte)0x02);                                                 // STX(2)
+      bb.put("0007".getBytes());                                            // 전문길이(4)=  Command ID + filler + ETX + CR = 7
+      bb.put("UC".getBytes());                                            // Command ID(2)
+      bb.put("000".getBytes());                                           // 여유필드(3)
+      bb.put((byte)0x03);                                                 // ETX(1)
+      bb.put((byte)0x0D);                                                 // CR(1)
+
+      byte[] telegram = new byte[ bb.position() ];
+      bb.rewind();
+      bb.get( telegram );
+
+      mRequestTelegramReconnectKscat = new byte[telegram.length + 4];
+      String telegramLength = String.format("%04d", telegram.length);
+      System.arraycopy(telegramLength.getBytes(), 0, mRequestTelegramReconnectKscat, 0, 4              );
+      System.arraycopy(telegram                 , 0, mRequestTelegramReconnectKscat, 4, telegram.length      );
+    }
+
     public boolean execute(String action, JSONArray args, final CallbackContext callbackContext) throws JSONException
     {
         Log.d(LOG_TAG, "Action: " + action);
@@ -247,6 +271,8 @@ public class IntentShim extends CordovaPlugin {
                 callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.INVALID_ACTION));
                 return false;
             }
+
+            // 컴포넌트 호출 서비스 시작
             JSONObject obj = args.getJSONObject(0);
             Intent intent = populateIntent(obj, callbackContext);
             startService(intent);
@@ -601,8 +627,8 @@ public class IntentShim extends CordovaPlugin {
     {
       HashMap<String,String> hashMap = new HashMap<>();
       Intent intent = null;
-      Log.d(LOG_TAG, "kalen populateIntent !!!");
-      Log.d(LOG_TAG, "kalen populateIntent "+obj.toString());
+      Log.d(LOG_TAG, "kalen populateKsnetIntent !!!");
+      Log.d(LOG_TAG, "kalen populateKsnetIntent "+obj.toString());
 
 
         Log.d(LOG_TAG, "kalen 결제");
@@ -625,11 +651,41 @@ public class IntentShim extends CordovaPlugin {
       return intent;
       }
 
+    private Intent populateReconnectKscatIntent(JSONObject obj, CallbackContext callbackContext) throws JSONException
+    {
+        HashMap<String,String> hashMap = new HashMap<>();
+        Intent intent = null;
+        Log.d(LOG_TAG, "kalen populateReconnectKscatIntent !!!");
+        Log.d(LOG_TAG, "kalen populateReconnectKscatIntent "+obj.toString());
+
+
+        Log.d(LOG_TAG, "kalen reconnect_kscat");
+
+        // mRequestTelegramReconnectKscat 가공
+        makeTelegramReconnect();
+        // makeTelegramVANTR();
+        ComponentName componentName = new ComponentName("com.ksnet.kscat_a","com.ksnet.kscat_a.PaymentIntentActivity");
+        intent = new Intent(Intent.ACTION_MAIN);
+        intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        intent.addCategory(Intent.CATEGORY_LAUNCHER);
+        intent.setComponent(componentName);
+        intent.putExtra("Telegram", mRequestTelegramReconnectKscat);
+        intent.putExtra("TelegramLength", mRequestTelegramReconnectKscat.length);
+
+        Log.d(LOG_TAG, "kalen return intent ...");
+        return intent;
+    }
+
     private Intent populateIntent(JSONObject obj, CallbackContext callbackContext) throws JSONException
     {
-
+        // payment 결제
         if(obj.has("package") && obj.getString("package").equals("com.elb.payment")){
             return this.populateKsnetIntent(obj,callbackContext);
+        }
+
+        // 단말기 재연결
+        if(obj.has("package") && obj.getString("package").equals("com.elb.payment.reconnect_kscat")){
+            return this.populateReconnectKscatIntent(obj,callbackContext);
         }
 
         //  Credit: https://github.com/chrisekelley/cordova-webintent
@@ -790,9 +846,26 @@ public class IntentShim extends CordovaPlugin {
     public void onActivityResult(int requestCode, int resultCode, Intent intent)
     {
         super.onActivityResult(requestCode, resultCode, intent);
+
         if (onActivityResultCallbackContext != null && intent != null)
         {
-            if((resultCode == RESULT_OK || resultCode == RESULT_CANCELED) && intent != null && intent.hasExtra("responseTelegram")){
+            // kscat 재연결 요청에 대한 KSCAT_A 의 응답
+            if(requestCode == 100) {
+              byte[] recvByte = intent.getByteArrayExtra("responseTelegram");
+              ExtraReconnectKscat trData = new ExtraReconnectKscat();
+              trData.SetData(recvByte);
+
+              intent.putExtra("transactionCode", new String(trData.transactionCode));
+              intent.putExtra("filler", new String(trData.filler));
+              intent.putExtra("resultCode", resultCode);
+              PluginResult result = new PluginResult(PluginResult.Status.OK, getIntentJson(intent));
+              result.setKeepCallback(true);
+              onActivityResultCallbackContext.sendPluginResult(result);
+            }
+
+            // 결제 응답
+            else if((resultCode == RESULT_OK || resultCode == RESULT_CANCELED) && intent != null && intent.hasExtra("responseTelegram"))
+            {
               byte[] recvByte = intent.getByteArrayExtra("responseTelegram");
               TransactionData trData = new TransactionData();
               trData.SetData(recvByte);
