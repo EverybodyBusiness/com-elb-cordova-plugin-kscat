@@ -17,8 +17,8 @@ public class ExtraReconnectKscat
         System.arraycopy(readData, readIdx, transactionCode, 0, 2);
         readIdx += 2;
         System.arraycopy(readData, readIdx, resultCode, 0, 1);
-        readIdx += 1;
-        System.arraycopy(readData, readIdx, filler, 0, 3);
+//         readIdx += 1;
+//         System.arraycopy(readData, readIdx, filler, 0, 3);
 //        readIdx += 3;
 //        System.arraycopy(readData, readIdx, etx, 0, 1);
 //        readIdx += 1;
