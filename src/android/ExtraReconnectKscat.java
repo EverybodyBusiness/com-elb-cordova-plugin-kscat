@@ -9,7 +9,6 @@ public class ExtraReconnectKscat
 
     public void SetData(byte[] readData)
     {
-    try{
         int totlen = readData.length;
         int readIdx = 1; // length 4, stx 1
 
