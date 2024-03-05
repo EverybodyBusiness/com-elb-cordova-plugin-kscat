@@ -1,23 +1,15 @@
 {
-  "name": "com-darryncampbell-cordova-plugin-intent",
-  "version": "2.2.0",
-  "description": "General purpose intent shim layer for cordova appliations on Android.  Handles various techniques for sending and receiving intents.",
-  "main": "intentShim.js",
-  "cordova": {
-    "id": "com-darryncampbell-cordova-plugin-intent",
-    "platforms": [
-      "android"
-    ]
+  "name": "@everybodybusiness/darryncampbell-elb",
+  "version": "1.1.0",
+  "description": "for payment kiosk personal",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/EverybodyBusiness/darryncampbell-elb.git"
+    "url": "git+https://github.com/EverybodyBusiness/darryncampbell-elb.git"
   },
-  "keywords": [
-    "ecosystem:cordova",
-	"cordova-android",
-    "Intent"
-  ],
-  "author": "Darryn Campbell",
-  "license": "MIT"
+  "author": "ELB",
+  "license": "ISC"
 }
