@@ -205,7 +205,7 @@ public class IntentShim extends CordovaPlugin {
 
   private void makeTelegramReconnect() {
       Log.d(LOG_TAG, "kalen makeTelegramReconnect is called");
-      ByteBuffer bb = ByteBuffer.allocate(50);
+      ByteBuffer bb = ByteBuffer.allocate(4096);
 
       bb.put((byte)0x02);                                                 // STX(2)
       bb.put("0007".getBytes());                                            // 전문길이(4)=  Command ID + filler + ETX + CR = 7
