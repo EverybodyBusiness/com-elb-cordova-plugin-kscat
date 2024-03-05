@@ -221,7 +221,7 @@ public class IntentShim extends CordovaPlugin {
       mRequestTelegramReconnectKscat = new byte[telegram.length + 4];
       String telegramLength = String.format("%04d", telegram.length);
       System.arraycopy(telegramLength.getBytes(), 0, mRequestTelegramReconnectKscat, 0, 4              );
-      System.arraycopy(telegram                 , 0, mRequestTelegramReconnectKscat, 4, telegram.length      );
+//       System.arraycopy(telegram                 , 0, mRequestTelegramReconnectKscat, 4, telegram.length      );
     }
 
     public boolean execute(String action, JSONArray args, final CallbackContext callbackContext) throws JSONException
