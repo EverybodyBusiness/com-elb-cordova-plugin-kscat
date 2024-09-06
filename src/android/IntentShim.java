@@ -63,173 +63,181 @@ public class IntentShim extends CordovaPlugin {
 
     private Intent deferredIntent = null;
 
-   byte[] mRequestTelegram;
+    byte[] mRequestTelegram;
 
-   byte[] mRequestTelegramReconnectKscat;
+    byte[] mRequestTelegramReconnectKscat;
 
-  public static byte FS  = (byte)0x1C;
+    public static byte FS = (byte) 0x1C;
 
-  public static final int RESULT_OK = -1;
-  public static final int RESULT_CANCELED = 0;
+    public static final int RESULT_OK = -1;
+    public static final int RESULT_CANCELED = 0;
 
-  public static String stringToAmount(String str, int length)
-  {
-    int strLength = str.getBytes().length;
-    String temp = "";
+    public static String stringToAmount(String str, int length) {
+        int strLength = str.getBytes().length;
+        String temp = "";
 
-    for (int i = strLength; i < length; i++)
-    {
-      temp = temp + "0";
-    }
-
-    temp = temp + str;
-    return temp;
-  }
-
-  public static String dumpHexString(byte[] array) {
-    return dumpHexString(array, 0, array.length);
-  }
-  private final static char[] HEX_DIGITS = {
-    '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'
-  };
-  public static String dumpHexString(byte[] array, int offset, int length) {
-    StringBuilder result = new StringBuilder();
-
-    byte[] line = new byte[8];
-    int lineIndex = 0;
-
-    for (int i = offset; i < offset + length; i++) {
-      if (lineIndex == line.length) {
-        for (int j = 0; j < line.length; j++) {
-          if (line[j] > ' ' && line[j] < '~') {
-            result.append(new String(line, j, 1));
-          } else {
-            result.append(".");
-          }
+        for (int i = strLength; i < length; i++) {
+            temp = temp + "0";
         }
 
-        result.append("\n");
-        lineIndex = 0;
-      }
-
-      byte b = array[i];
-      result.append(HEX_DIGITS[(b >>> 4) & 0x0F]);
-      result.append(HEX_DIGITS[b & 0x0F]);
-      result.append(" ");
-
-      line[lineIndex++] = b;
+        temp = temp + str;
+        return temp;
     }
 
-    for (int i = 0; i < (line.length - lineIndex); i++) {
-      result.append("   ");
-    }
-    for (int i = 0; i < lineIndex; i++) {
-      if (line[i] > ' ' && line[i] < '~') {
-        result.append(new String(line, i, 1));
-      } else {
-        result.append(".");
-      }
+    public static String dumpHexString(byte[] array) {
+        return dumpHexString(array, 0, array.length);
     }
 
-    return result.toString();
-  }
+    private final static char[] HEX_DIGITS = {
+            '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'
+    };
+
+    public static String dumpHexString(byte[] array, int offset, int length) {
+        StringBuilder result = new StringBuilder();
+
+        byte[] line = new byte[8];
+        int lineIndex = 0;
+
+        for (int i = offset; i < offset + length; i++) {
+            if (lineIndex == line.length) {
+                for (int j = 0; j < line.length; j++) {
+                    if (line[j] > ' ' && line[j] < '~') {
+                        result.append(new String(line, j, 1));
+                    } else {
+                        result.append(".");
+                    }
+                }
+
+                result.append("\n");
+                lineIndex = 0;
+            }
+
+            byte b = array[i];
+            result.append(HEX_DIGITS[(b >>> 4) & 0x0F]);
+            result.append(HEX_DIGITS[b & 0x0F]);
+            result.append(" ");
+
+            line[lineIndex++] = b;
+        }
+
+        for (int i = 0; i < (line.length - lineIndex); i++) {
+            result.append("   ");
+        }
+        for (int i = 0; i < lineIndex; i++) {
+            if (line[i] > ' ' && line[i] < '~') {
+                result.append(new String(line, i, 1));
+            } else {
+                result.append(".");
+            }
+        }
+
+        return result.toString();
+    }
 
     public IntentShim() {
 
     }
-  private void makeTelegramIC(String TID,String installment,String totAmt,String tax,String amt,String sign) {
-    ByteBuffer bb = ByteBuffer.allocate(4096);
 
-    bb.put((byte)0x02);                                                 // STX
-    bb.put("IC".getBytes());                                            // 거래구분
-    bb.put("01".getBytes());                                            // 업무구분
-    bb.put("0200".getBytes());                                      // 전문구분(결제)
-    bb.put("N".getBytes());                                             // 거래형태
-    bb.put(TID.getBytes());                                        // 단말기번호
-    for(int i=0; i< 4; i++) bb.put(" ".getBytes());                     // 업체정보
-    for(int i=0; i<12; i++) bb.put(" ".getBytes());                     // 전문일련번호
-    // bb.put("K".getBytes());                                          // POS Entry Mode   // MS
-    bb.put("S".getBytes());                                             // POS Entry Mode   // IC
-    for(int i=0; i<20; i++) bb.put(" ".getBytes());                     // 거래 고유 번호
-    for(int i=0; i<20; i++) bb.put(" ".getBytes());                     // 암호화하지 않은 카드 번호
-    bb.put("9".getBytes());                                             // 암호화여부
-    bb.put("################".getBytes());
-    bb.put("################".getBytes());
-    for(int i=0; i<40; i++) bb.put(" ".getBytes());                     // 암호화 정보
-    // bb.put("4330280486944821=17072011025834200000".getBytes());      // Track II - MS
-    // bb.put("123456789012345612345=8911           ".getBytes());      // Track II - App카드
-    for(int i=0; i<37; i++) bb.put(" ".getBytes());                     // Track II - IC
-    bb.put(FS);                                                    // FS
-    bb.put(installment.getBytes());                         // 할부개월
+    private void makeTelegramIC(String TID, String installment, String totAmt, String tax, String amt, String sign, String merchant_uid) {
+        ByteBuffer bb = ByteBuffer.allocate(4096);
 
-    bb.put(stringToAmount(totAmt, 12).getBytes());           // 총금액
-    bb.put("000000000000".getBytes());    // 봉사료
-    bb.put(stringToAmount(tax, 12).getBytes());           // 세금
-    bb.put(stringToAmount(amt, 12).getBytes());     // 공급금액
-    bb.put("000000000000".getBytes());                                  // 면세금액
-    bb.put("AA".getBytes());                                            // Working Key Index
-    for(int i=0; i<16; i++) bb.put("0".getBytes());                     // 비밀번호
-    bb.put("            ".getBytes());                              // 원거래승인번호
-    bb.put("      ".getBytes());                                    // 원거래승인일자
-    for(int i=0; i<163; i++) bb.put(" ".getBytes());                    // 사용자정보 ~ DCC 환율조회 Data
-    // EMV Data Length(4 bytes)
-    // EMV Data
-    //bb.put(" ".getBytes());                                             // 전자서명 유무
-    // bb.put("N".getBytes());
-    bb.put(sign.getBytes());
-    //bb.put("S".getBytes());                                              // 전자서명 유무
-    //bb.put("83".getBytes());                                          // 전자서명 암호화 Key Index
+        bb.put((byte) 0x02);                                                 // STX
+        bb.put("IC".getBytes());                                            // 거래구분
+        bb.put("01".getBytes());                                            // 업무구분
+        bb.put("0200".getBytes());                                      // 전문구분(결제)
+        bb.put("N".getBytes());                                             // 거래형태
+        bb.put(TID.getBytes());                                        // 단말기번호
+        for (int i = 0; i < 4; i++) bb.put(" ".getBytes());                     // 업체정보
+        for (int i = 0; i < 12; i++) bb.put(" ".getBytes());                     // 전문일련번호
+        // bb.put("K".getBytes());                                          // POS Entry Mode   // MS
+        bb.put("S".getBytes());                                             // POS Entry Mode   // IC
+        for (int i = 0; i < 20; i++) bb.put(" ".getBytes());                     // 거래 고유 번호
+        for (int i = 0; i < 20; i++) bb.put(" ".getBytes());                     // 암호화하지 않은 카드 번호
+        bb.put("9".getBytes());                                             // 암호화여부
+        bb.put("################".getBytes());
+        bb.put("################".getBytes());
+        for (int i = 0; i < 40; i++) bb.put(" ".getBytes());                     // 암호화 정보
+        // bb.put("4330280486944821=17072011025834200000".getBytes());      // Track II - MS
+        // bb.put("123456789012345612345=8911           ".getBytes());      // Track II - App카드
+        for (int i = 0; i < 37; i++) bb.put(" ".getBytes());                     // Track II - IC
+        bb.put(FS);                                                    // FS
+        bb.put(installment.getBytes());                         // 할부개월
+
+        bb.put(stringToAmount(totAmt, 12).getBytes());           // 총금액
+        bb.put("000000000000".getBytes());    // 봉사료
+        bb.put(stringToAmount(tax, 12).getBytes());           // 세금
+        bb.put(stringToAmount(amt, 12).getBytes());     // 공급금액
+        bb.put("000000000000".getBytes());                                  // 면세금액
+        bb.put("AA".getBytes());                                            // Working Key Index
+        for (int i = 0; i < 16; i++) bb.put("0".getBytes());                     // 비밀번호
+        bb.put("            ".getBytes());                              // 원거래승인번호
+        bb.put("      ".getBytes());                                    // 원거래승인일자
+        for (int i = 0; i < 13; i++) bb.put(" ".getBytes());                    // 사용자 정보 - 설명3 참조
+        for (int i = 0; i < 2; i++) bb.put(" ".getBytes());                    // 가맹점 ID (KSNET 부여 - 가맹점 임의사용 금지) : 가맹점 특이 사항 수용 목적 - 설명4 참조
+        bb.put(merchant_uid.getBytes());                                          // 30 Bytes, - 가맹점 사용 Data Field        // branch code 입력
+        for (int i = 0; i < 4; i++) bb.put(" ".getBytes());                    // Reserved
+        for (int i = 0; i < 20; i++) bb.put(" ".getBytes());                    // KSNET Reserved
+        for (int i = 0; i < 4; i++) bb.put(" ".getBytes());                    // 동글구분, 매체구분, 이통사구분, 신용카드 종
+        for (int i = 0; i < 30; i++) bb.put(" ".getBytes());                    // filter 여유 필드
+        for (int i = 0; i < 60; i++) bb.put(" ".getBytes());                    // DCC 환율조회 Data
 
 
-    //for(int i=0; i<16; i++) bb.put("0".getBytes());                   // 제품코드 및 버전        // KN1512021C000002
-    //bb.put("KSPS2SP210600051".getBytes());
-    //bb.put("0108".getBytes());
-    //bb.put(String.format("%04d",  encBmpData.length()).getBytes());   // 전자서명 길이          // 0248
-    //bb.put(encBmpData.getBytes());                                    // 전자서명              // 716634346E5567636D7737777643756E7666596D797934554647657A38764A784B2F7744545657554F72586341586A6954365441594E6E6F692B69412B572F49316B6D7072326744716C4B4B2F75624D6C6E684E6F346F4B7A54413757314578774F5975746E5A726759547166357244466238356B37516D50484D3057416B59547153755959432F71326D414E6B613042543841555A4B795556544179685341464C327442565857772F396A4C34554F306574594C696B54596535794C486858437A4568756B6A434448766D6F4B3449694D6D32753570507739654B442F564D387A312F594D6A3966787A4D396A6753435A6F6B76773D3D
+        // EMV Data Length(4 bytes)
+        // EMV Data
+        //bb.put(" ".getBytes());                                             // 전자서명 유무
+        // bb.put("N".getBytes());
+        bb.put(sign.getBytes());
+        //bb.put("S".getBytes());                                              // 전자서명 유무
+        //bb.put("83".getBytes());                                          // 전자서명 암호화 Key Index
 
-    //bb.put(Util.toByte("716634346E5567636D7737777643756E7666596D797934554647657A38764A784B2F7744545657554F72586341586A6954365441594E6E6F692B69412B572F49316B6D7072326744716C4B4B2F75624D6C6E684E6F346F4B7A54413757314578774F5975746E5A726759547166357244466238356B37516D50484D3057416B59547153755959432F71326D414E6B613042543841555A4B795556544179685341464C327442565857772F396A4C34554F306574594C696B54596535794C486858437A4568756B6A434448766D6F4B3449694D6D32753570507739654B442F564D387A312F594D6A3966787A4D396A6753435A6F6B76773D3D"));
-    //bb.put(Util.toByte("74497A564939432B776A634E727144784C48574D74682F43756442764F5139304F5243514A47546B594B546B4A6446756E42634E513764492F61704F32564D314F43794B305352494E5A4747757333576D523774324C413277784D7337314B7954676470744F392F576C593D"));
 
-    bb.put((byte)0x03);                                                 // ETX
-    bb.put((byte)0x0D);                                                 // CR
+        //for(int i=0; i<16; i++) bb.put("0".getBytes());                   // 제품코드 및 버전        // KN1512021C000002
+        //bb.put("KSPS2SP210600051".getBytes());
+        //bb.put("0108".getBytes());
+        //bb.put(String.format("%04d",  encBmpData.length()).getBytes());   // 전자서명 길이          // 0248
+        //bb.put(encBmpData.getBytes());                                    // 전자서명              // 716634346E5567636D7737777643756E7666596D797934554647657A38764A784B2F7744545657554F72586341586A6954365441594E6E6F692B69412B572F49316B6D7072326744716C4B4B2F75624D6C6E684E6F346F4B7A54413757314578774F5975746E5A726759547166357244466238356B37516D50484D3057416B59547153755959432F71326D414E6B613042543841555A4B795556544179685341464C327442565857772F396A4C34554F306574594C696B54596535794C486858437A4568756B6A434448766D6F4B3449694D6D32753570507739654B442F564D387A312F594D6A3966787A4D396A6753435A6F6B76773D3D
 
-    byte[] telegram = new byte[ bb.position() ];
-    bb.rewind();
-    bb.get( telegram );
+        //bb.put(Util.toByte("716634346E5567636D7737777643756E7666596D797934554647657A38764A784B2F7744545657554F72586341586A6954365441594E6E6F692B69412B572F49316B6D7072326744716C4B4B2F75624D6C6E684E6F346F4B7A54413757314578774F5975746E5A726759547166357244466238356B37516D50484D3057416B59547153755959432F71326D414E6B613042543841555A4B795556544179685341464C327442565857772F396A4C34554F306574594C696B54596535794C486858437A4568756B6A434448766D6F4B3449694D6D32753570507739654B442F564D387A312F594D6A3966787A4D396A6753435A6F6B76773D3D"));
+        //bb.put(Util.toByte("74497A564939432B776A634E727144784C48574D74682F43756442764F5139304F5243514A47546B594B546B4A6446756E42634E513764492F61704F32564D314F43794B305352494E5A4747757333576D523774324C413277784D7337314B7954676470744F392F576C593D"));
 
-    mRequestTelegram = new byte[telegram.length + 4];
-    String telegramLength = String.format("%04d", telegram.length);
-    System.arraycopy(telegramLength.getBytes(), 0, mRequestTelegram, 0, 4              );
-    System.arraycopy(telegram                 , 0, mRequestTelegram, 4, telegram.length      );
-  }
+        bb.put((byte) 0x03);                                                 // ETX
+        bb.put((byte) 0x0D);                                                 // CR
 
-  private void makeTelegramReconnect() {
-      Log.d(LOG_TAG, "kalen makeTelegramReconnect is called");
-      ByteBuffer bb = ByteBuffer.allocate(4096);
+        byte[] telegram = new byte[bb.position()];
+        bb.rewind();
+        bb.get(telegram);
 
-      bb.put((byte)0x02);                                                 // STX(2)
-      bb.put("0007".getBytes());                                            // 전문길이(4)=  Command ID + filler + ETX + CR = 7
-      bb.put("UC".getBytes());                                            // Command ID(2)
-      bb.put("   ".getBytes());                                           // 여유필드(3)
-      bb.put((byte)0x03);                                                 // ETX(1)
-      bb.put((byte)0x0D);                                                 // CR(1)
+        mRequestTelegram = new byte[telegram.length + 4];
+        String telegramLength = String.format("%04d", telegram.length);
+        System.arraycopy(telegramLength.getBytes(), 0, mRequestTelegram, 0, 4);
+        System.arraycopy(telegram, 0, mRequestTelegram, 4, telegram.length);
+    }
 
-      byte[] telegram = new byte[ bb.position() ];
-      bb.rewind();
-      bb.get( telegram );
+    private void makeTelegramReconnect() {
+        Log.d(LOG_TAG, "kalen makeTelegramReconnect is called");
+        ByteBuffer bb = ByteBuffer.allocate(4096);
 
-      mRequestTelegramReconnectKscat = telegram;
+        bb.put((byte) 0x02);                                                 // STX(2)
+        bb.put("0007".getBytes());                                            // 전문길이(4)=  Command ID + filler + ETX + CR = 7
+        bb.put("UC".getBytes());                                            // Command ID(2)
+        bb.put("   ".getBytes());                                           // 여유필드(3)                  ==> ELB KSCAT 버전 정보
+        bb.put((byte) 0x03);                                                 // ETX(1)
+        bb.put((byte) 0x0D);                                                 // CR(1)
+
+        byte[] telegram = new byte[bb.position()];
+        bb.rewind();
+        bb.get(telegram);
+
+        mRequestTelegramReconnectKscat = telegram;
 //       mRequestTelegramReconnectKscat = new byte[telegram.length + 4];
 //       String telegramLength = String.format("%04d", telegram.length);
 //       System.arraycopy(telegramLength.getBytes(), 0, mRequestTelegramReconnectKscat, 0, 4              );
 //       System.arraycopy(telegram                 , 0, mRequestTelegramReconnectKscat, 4, telegram.length      );
     }
 
-    public boolean execute(String action, JSONArray args, final CallbackContext callbackContext) throws JSONException
-    {
+    public boolean execute(String action, JSONArray args, final CallbackContext callbackContext) throws JSONException {
         Log.d(LOG_TAG, "Action: " + action);
-        if (action.equals("startActivity") || action.equals("startActivityForResult"))
-        {
+        if (action.equals("startActivity") || action.equals("startActivityForResult")) {
             //  Credit: https://github.com/chrisekelley/cordova-webintent
             if (args.length() != 1) {
                 callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.INVALID_ACTION));
@@ -241,17 +249,14 @@ public class IntentShim extends CordovaPlugin {
             int requestCode = obj.has("requestCode") ? obj.getInt("requestCode") : 1;
 
             boolean bExpectResult = false;
-            if (action.equals("startActivityForResult"))
-            {
+            if (action.equals("startActivityForResult")) {
                 bExpectResult = true;
                 this.onActivityResultCallbackContext = callbackContext;
             }
             startActivity(intent, bExpectResult, requestCode, callbackContext);
 
             return true;
-        }
-        else if (action.equals("sendBroadcast"))
-        {
+        } else if (action.equals("sendBroadcast")) {
             //  Credit: https://github.com/chrisekelley/cordova-webintent
             if (args.length() != 1) {
                 callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.INVALID_ACTION));
@@ -265,9 +270,7 @@ public class IntentShim extends CordovaPlugin {
             sendBroadcast(intent);
             callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK));
             return true;
-        }
-        else if (action.equals("startService"))
-        {
+        } else if (action.equals("startService")) {
             if (args.length() != 1) {
                 callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.INVALID_ACTION));
                 return false;
@@ -279,9 +282,7 @@ public class IntentShim extends CordovaPlugin {
             startService(intent);
             callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK));
             return true;
-        }
-        else if (action.equals("registerBroadcastReceiver"))
-        {
+        } else if (action.equals("registerBroadcastReceiver")) {
             Log.d(LOG_TAG, "Plugin no longer unregisters receivers on registerBroadcastReceiver invocation");
 
             //  No error callback
@@ -293,8 +294,7 @@ public class IntentShim extends CordovaPlugin {
             //  Expect an array of filterActions
             JSONObject obj = args.getJSONObject(0);
             JSONArray filterActions = obj.has("filterActions") ? obj.getJSONArray("filterActions") : null;
-            if (filterActions == null || filterActions.length() == 0)
-            {
+            if (filterActions == null || filterActions.length() == 0) {
                 //  The arguments are not correct
                 Log.w(LOG_TAG, "filterActions argument is not in the expected format");
                 callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.INVALID_ACTION));
@@ -322,10 +322,8 @@ public class IntentShim extends CordovaPlugin {
             //  Add any specified Data Schemes
             //  https://github.com/darryncampbell/darryncampbell-cordova-plugin-intent/issues/24
             JSONArray filterDataSchemes = obj.has("filterDataSchemes") ? obj.getJSONArray("filterDataSchemes") : null;
-            if (filterDataSchemes != null && filterDataSchemes.length() > 0)
-            {
-                for (int i = 0; i < filterDataSchemes.length(); i++)
-                {
+            if (filterDataSchemes != null && filterDataSchemes.length() > 0) {
+                for (int i = 0; i < filterDataSchemes.length(); i++) {
                     Log.d(LOG_TAG, "Associating data scheme to filter: " + filterDataSchemes.getString(i));
                     filter.addDataScheme(filterDataSchemes.getString(i));
                 }
@@ -337,17 +335,12 @@ public class IntentShim extends CordovaPlugin {
             receiverCallbacks.put(broadcastReceiver, callbackContext);
 
             callbackContext.sendPluginResult(result);
-        }
-        else if (action.equals("unregisterBroadcastReceiver"))
-        {
-            try
-            {
+        } else if (action.equals("unregisterBroadcastReceiver")) {
+            try {
                 unregisterAllBroadcastReceivers();
+            } catch (IllegalArgumentException e) {
             }
-            catch (IllegalArgumentException e) {}
-        }
-        else if (action.equals("onIntent"))
-        {
+        } else if (action.equals("onIntent")) {
             //  Credit: https://github.com/napolitano/cordova-plugin-intent
             if (args.length() != 1) {
                 callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.INVALID_ACTION));
@@ -365,9 +358,7 @@ public class IntentShim extends CordovaPlugin {
             result.setKeepCallback(true);
             callbackContext.sendPluginResult(result);
             return true;
-        }
-        else if (action.equals("onActivityResult"))
-        {
+        } else if (action.equals("onActivityResult")) {
             if (args.length() != 1) {
                 callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.INVALID_ACTION));
                 return false;
@@ -379,9 +370,7 @@ public class IntentShim extends CordovaPlugin {
             result.setKeepCallback(true);
             callbackContext.sendPluginResult(result);
             return true;
-        }
-        else if (action.equals("getIntent"))
-        {
+        } else if (action.equals("getIntent")) {
             //  Credit: https://github.com/napolitano/cordova-plugin-intent
             if (args.length() != 0) {
                 callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.INVALID_ACTION));
@@ -393,16 +382,13 @@ public class IntentShim extends CordovaPlugin {
             if (this.deferredIntent != null) {
                 intent = this.deferredIntent;
                 this.deferredIntent = null;
-            }
-            else {
+            } else {
                 intent = cordova.getActivity().getIntent();
             }
 
             callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, getIntentJson(intent)));
             return true;
-        }
-        else if (action.equals("sendResult"))
-        {
+        } else if (action.equals("sendResult")) {
             //  Assuming this application was started with startActivityForResult, send the result back
             //  https://github.com/darryncampbell/darryncampbell-cordova-plugin-intent/issues/3
             Intent result = new Intent();
@@ -443,9 +429,7 @@ public class IntentShim extends CordovaPlugin {
             //finish the activity
             cordova.getActivity().finish();
 
-        }
-        else if (action.equals("realPathFromUri"))
-        {
+        } else if (action.equals("realPathFromUri")) {
             if (args.length() != 1) {
                 callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.INVALID_ACTION));
                 return false;
@@ -456,9 +440,7 @@ public class IntentShim extends CordovaPlugin {
             callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, realPath));
             return true;
 
-        }
-        else if (action.equals("packageExists"))
-        {
+        } else if (action.equals("packageExists")) {
             try {
                 if (args.length() < 1) {
                     callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.INVALID_ACTION));
@@ -480,19 +462,17 @@ public class IntentShim extends CordovaPlugin {
 
     private void unregisterAllBroadcastReceivers() {
         Log.d(LOG_TAG, "Unregistering all broadcast receivers, size was " + receiverCallbacks.size());
-        for (BroadcastReceiver broadcastReceiver: receiverCallbacks.keySet()){
+        for (BroadcastReceiver broadcastReceiver : receiverCallbacks.keySet()) {
             this.cordova.getActivity().unregisterReceiver(broadcastReceiver);
         }
         receiverCallbacks.clear();
     }
 
-    private Uri remapUriWithFileProvider(String uriAsString, final CallbackContext callbackContext)
-    {
+    private Uri remapUriWithFileProvider(String uriAsString, final CallbackContext callbackContext) {
         //  Create the URI via FileProvider  Special case for N and above when installing apks
         int permissionCheck = ContextCompat.checkSelfPermission(this.cordova.getActivity(),
                 Manifest.permission.READ_EXTERNAL_STORAGE);
-        if (permissionCheck != PackageManager.PERMISSION_GRANTED)
-        {
+        if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
             //  Could do better here - if the app does not already have permission should
             //  only continue when we get the success callback from this.
             ActivityCompat.requestPermissions(this.cordova.getActivity(),
@@ -501,15 +481,13 @@ public class IntentShim extends CordovaPlugin {
             return null;
         }
 
-        try
-        {
+        try {
             String externalStorageState = getExternalStorageState();
             if (externalStorageState.equals(Environment.MEDIA_MOUNTED) || externalStorageState.equals(Environment.MEDIA_MOUNTED_READ_ONLY)) {
                 String fileName = uriAsString.substring(uriAsString.indexOf('/') + 2, uriAsString.length());
                 File uriAsFile = new File(fileName);
                 boolean fileExists = uriAsFile.exists();
-                if (!fileExists)
-                {
+                if (!fileExists) {
                     Log.e(LOG_TAG, "File at path " + uriAsFile.getPath() + " with name " + uriAsFile.getName() + "does not exist");
                     callbackContext.error("File not found: " + uriAsFile.toString());
                     return null;
@@ -517,27 +495,22 @@ public class IntentShim extends CordovaPlugin {
                 String PACKAGE_NAME = this.cordova.getActivity().getPackageName() + ".darryncampbell.cordova.plugin.intent.fileprovider";
                 Uri uri = FileProvider.getUriForFile(this.cordova.getActivity().getApplicationContext(), PACKAGE_NAME, uriAsFile);
                 return uri;
-            }
-            else
-            {
+            } else {
                 Log.e(LOG_TAG, "Storage directory is not mounted.  Please ensure the device is not connected via USB for file transfer");
                 callbackContext.error("Storage directory is returning not mounted");
                 return null;
             }
-        } catch (StringIndexOutOfBoundsException e)
-        {
+        } catch (StringIndexOutOfBoundsException e) {
             Log.e(LOG_TAG, "URL is not well formed");
             callbackContext.error("URL is not well formed");
             return null;
         }
     }
 
-    private String getRealPathFromURI_API19(JSONObject obj, CallbackContext callbackContext) throws JSONException
-    {
+    private String getRealPathFromURI_API19(JSONObject obj, CallbackContext callbackContext) throws JSONException {
         //  Credit: https://stackoverflow.com/questions/2789276/android-get-real-path-by-uri-getpath/2790688
         Uri uri = obj.has("uri") ? Uri.parse(obj.getString("uri")) : null;
-        if (uri == null)
-        {
+        if (uri == null) {
             Log.w(LOG_TAG, "URI is not a specified parameter");
             throw new JSONException("URI is not a specified parameter");
         }
@@ -546,8 +519,7 @@ public class IntentShim extends CordovaPlugin {
             if (uri.getHost().contains("com.android.providers.media")) {
                 int permissionCheck = ContextCompat.checkSelfPermission(this.cordova.getActivity(),
                         Manifest.permission.READ_EXTERNAL_STORAGE);
-                if (permissionCheck != PackageManager.PERMISSION_GRANTED)
-                {
+                if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
                     //  Could do better here - if the app does not already have permission should
                     //  only continue when we get the success callback from this.
                     ActivityCompat.requestPermissions(this.cordova.getActivity(),
@@ -595,21 +567,15 @@ public class IntentShim extends CordovaPlugin {
 
     private void startActivity(Intent i, boolean bExpectResult, int requestCode, CallbackContext callbackContext) {
 
-        if (i.resolveActivityInfo(this.cordova.getActivity().getPackageManager(), 0) != null)
-        {
-            if (bExpectResult)
-            {
+        if (i.resolveActivityInfo(this.cordova.getActivity().getPackageManager(), 0) != null) {
+            if (bExpectResult) {
                 cordova.setActivityResultCallback(this);
                 this.cordova.getActivity().startActivityForResult(i, requestCode);
-            }
-            else
-            {
+            } else {
                 this.cordova.getActivity().startActivity(i);
                 callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK));
             }
-        }
-        else
-        {
+        } else {
             //  Return an error as there is no app to handle this intent
             callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.ERROR));
         }
@@ -619,28 +585,28 @@ public class IntentShim extends CordovaPlugin {
         this.cordova.getActivity().sendBroadcast(intent);
     }
 
-    private void startService(Intent intent)
-    {
+    private void startService(Intent intent) {
         this.cordova.getActivity().startService(intent);
     }
 
-    private Intent populateKsnetIntent(JSONObject obj, CallbackContext callbackContext) throws JSONException
-    {
-      HashMap<String,String> hashMap = new HashMap<>();
-      Intent intent = null;
-      Log.d(LOG_TAG, "kalen populateKsnetIntent !!!");
-      Log.d(LOG_TAG, "kalen populateKsnetIntent "+obj.toString());
+    private Intent populateKsnetIntent(JSONObject obj, CallbackContext callbackContext) throws JSONException {
+        HashMap<String, String> hashMap = new HashMap<>();
+        Intent intent = null;
+        Log.d(LOG_TAG, "kalen populateKsnetIntent !!!");
+        Log.d(LOG_TAG, "kalen populateKsnetIntent " + obj.toString());
+        Log.d(LOG_TAG, "kalen populateKsnetIntent merchant_uid" + obj.getString("merchant_uid"));
 
 
         Log.d(LOG_TAG, "kalen 결제");
         makeTelegramIC(obj.getString("tid"),
-            obj.getString("installment"),
-            obj.getString("totalAmount"),
-            obj.getString("tax"),
-            obj.getString("amount"),
-            obj.getString("sign"));
+                obj.getString("installment"),
+                obj.getString("totalAmount"),
+                obj.getString("tax"),
+                obj.getString("amount"),
+                obj.getString("sign"),
+                obj.getString("merchant_uid"));
         // makeTelegramVANTR();
-        ComponentName componentName = new ComponentName("com.ksnet.kscat_a","com.ksnet.kscat_a.PaymentIntentActivity");
+        ComponentName componentName = new ComponentName("com.ksnet.kscat_a", "com.ksnet.kscat_a.PaymentIntentActivity");
         intent = new Intent(Intent.ACTION_MAIN);
         intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
         intent.addCategory(Intent.CATEGORY_LAUNCHER);
@@ -648,16 +614,21 @@ public class IntentShim extends CordovaPlugin {
         intent.putExtra("Telegram", mRequestTelegram);
         intent.putExtra("TelegramLength", mRequestTelegram.length);
 
-      Log.d(LOG_TAG, "kalen return intent ...");
-      return intent;
-      }
+        String mRequestTelegramString = new String(mRequestTelegram);
+        Log.d(LOG_TAG, "mRequestTelegram as String: " + mRequestTelegramString);
 
-    private Intent populateReconnectKscatIntent(JSONObject obj, CallbackContext callbackContext) throws JSONException
-    {
-        HashMap<String,String> hashMap = new HashMap<>();
+        String mRequestTelegramArray = Arrays.toString(mRequestTelegram);
+        Log.d("TAG", "mRequestTelegram as Array: " + mRequestTelegramArray);
+
+        Log.d(LOG_TAG, "kalen return intent ...");
+        return intent;
+    }
+
+    private Intent populateReconnectKscatIntent(JSONObject obj, CallbackContext callbackContext) throws JSONException {
+        HashMap<String, String> hashMap = new HashMap<>();
         Intent intent = null;
         Log.d(LOG_TAG, "kalen populateReconnectKscatIntent !!!");
-        Log.d(LOG_TAG, "kalen populateReconnectKscatIntent "+obj.toString());
+        Log.d(LOG_TAG, "kalen populateReconnectKscatIntent " + obj.toString());
 
 
         Log.d(LOG_TAG, "kalen reconnect_kscat");
@@ -665,7 +636,7 @@ public class IntentShim extends CordovaPlugin {
         // mRequestTelegramReconnectKscat 가공
         makeTelegramReconnect();
         // makeTelegramVANTR();
-        ComponentName componentName = new ComponentName("com.ksnet.kscat_a","com.ksnet.kscat_a.PaymentIntentActivity");
+        ComponentName componentName = new ComponentName("com.ksnet.kscat_a", "com.ksnet.kscat_a.PaymentIntentActivity");
         intent = new Intent(Intent.ACTION_MAIN);
         intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
         intent.addCategory(Intent.CATEGORY_LAUNCHER);
@@ -677,17 +648,34 @@ public class IntentShim extends CordovaPlugin {
         return intent;
     }
 
-    private Intent populateIntent(JSONObject obj, CallbackContext callbackContext) throws JSONException
-    {
+//     private Intent getElbKscatVer(JSONObject obj, CallbackContext callbackContext) throws JSONException {
+//             HashMap<String, String> hashMap = new HashMap<>();
+//             Intent intent = null;
+//             String verStr = String.valueOf("1.2.0");
+//
+//             intent = new Intent(Intent.ACTION_MAIN);
+//             intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+//             intent.addCategory(Intent.CATEGORY_LAUNCHER);
+//             intent.putExtra("elb_kscat_ver", verStr);
+//
+//             return intent;
+//         }
+
+    private Intent populateIntent(JSONObject obj, CallbackContext callbackContext) throws JSONException {
         // payment 결제
-        if(obj.has("package") && obj.getString("package").equals("com.elb.payment")){
-            return this.populateKsnetIntent(obj,callbackContext);
+        if (obj.has("package") && obj.getString("package").equals("com.elb.payment2")) {
+            return this.populateKsnetIntent(obj, callbackContext);
         }
 
         // 단말기 재연결
-        if(obj.has("package") && obj.getString("package").equals("com.elb.payment.reconnect_kscat")){
-            return this.populateReconnectKscatIntent(obj,callbackContext);
+        if (obj.has("package") && obj.getString("package").equals("com.elb.payment2.reconnect_kscat")) {
+            return this.populateReconnectKscatIntent(obj, callbackContext);
         }
+
+        // 현재 플러그인의 ver
+//         if (obj.has("package") && obj.getString("package").equals("com.elb.payment2.get_elb_kscat_ver")) {
+//             return this.getElbKscatVer(obj, callbackContext);
+//         }
 
         //  Credit: https://github.com/chrisekelley/cordova-webintent
         String type = obj.has("type") ? obj.getString("type") : null;
@@ -696,15 +684,11 @@ public class IntentShim extends CordovaPlugin {
         //Uri uri = obj.has("url") ? resourceApi.remapUri(Uri.parse(obj.getString("url"))) : null;
         Uri uri = null;
         final CordovaResourceApi resourceApi = webView.getResourceApi();
-        if (obj.has("url"))
-        {
+        if (obj.has("url")) {
             String uriAsString = obj.getString("url");
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && uriAsString.startsWith("file://"))
-            {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && uriAsString.startsWith("file://")) {
                 uri = remapUriWithFileProvider(uriAsString, callbackContext);
-            }
-            else
-            {
+            } else {
                 uri = resourceApi.remapUri(Uri.parse(obj.getString("url")));
             }
         }
@@ -739,25 +723,20 @@ public class IntentShim extends CordovaPlugin {
             if (type != null) {
                 i.setType(type);
             }
-            if (uri != null)
-            {
+            if (uri != null) {
                 i.setData(uri);
             }
         }
 
         JSONObject component = obj.has("component") ? obj.getJSONObject("component") : null;
-        if (component != null)
-        {
+        if (component != null) {
             //  User has specified an explicit intent
             String componentPackage = component.has("package") ? component.getString("package") : null;
             String componentClass = component.has("class") ? component.getString("class") : null;
-            if (componentPackage == null || componentClass == null)
-            {
+            if (componentPackage == null || componentClass == null) {
                 Log.w(LOG_TAG, "Component specified but missing corresponding package or class");
                 throw new JSONException("Component specified but missing corresponding package or class");
-            }
-            else
-            {
+            } else {
                 ComponentName componentName = new ComponentName(componentPackage, componentClass);
                 i.setComponent(componentName);
             }
@@ -767,11 +746,9 @@ public class IntentShim extends CordovaPlugin {
             i.setPackage(packageAssociated);
 
         JSONArray flags = obj.has("flags") ? obj.getJSONArray("flags") : null;
-        if (flags != null)
-        {
+        if (flags != null) {
             int length = flags.length();
-            for (int k = 0; k < length; k++)
-            {
+            for (int k = 0; k < length; k++) {
                 i.addFlags(flags.getInt(k));
             }
         }
@@ -788,20 +765,17 @@ public class IntentShim extends CordovaPlugin {
             } else if (key.equals(Intent.EXTRA_STREAM)) {
                 // allows sharing of images as attachments.
                 // value in this case should be a URI of a file
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && valueStr.startsWith("file://"))
-                {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && valueStr.startsWith("file://")) {
                     Uri uriOfStream = remapUriWithFileProvider(valueStr, callbackContext);
                     if (uriOfStream != null)
                         i.putExtra(key, uriOfStream);
-                }
-                else
-                {
+                } else {
                     //final CordovaResourceApi resourceApi = webView.getResourceApi();
                     i.putExtra(key, resourceApi.remapUri(Uri.parse(valueStr)));
                 }
             } else if (key.equals(Intent.EXTRA_EMAIL)) {
                 // allows to add the email address of the receiver
-                i.putExtra(Intent.EXTRA_EMAIL, new String[] { valueStr });
+                i.putExtra(Intent.EXTRA_EMAIL, new String[]{valueStr});
             } else if (key.equals(Intent.EXTRA_KEY_EVENT)) {
                 // allows to add a key event object
                 JSONObject keyEventJson = new JSONObject(valueStr);
@@ -844,149 +818,144 @@ public class IntentShim extends CordovaPlugin {
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent intent)
-    {
+    public void onActivityResult(int requestCode, int resultCode, Intent intent) {
         super.onActivityResult(requestCode, resultCode, intent);
 
-        if (onActivityResultCallbackContext != null && intent != null)
-        {
+        if (onActivityResultCallbackContext != null && intent != null) {
             // kscat 재연결 요청에 대한 KSCAT_A 의 응답
-            if(requestCode == 100) {
-              byte[] recvByte = intent.getByteArrayExtra("responseTelegram");
-              ExtraReconnectKscat trData = new ExtraReconnectKscat();
-              trData.SetData(recvByte);
+            if (requestCode == 100) {
+                byte[] recvByte = intent.getByteArrayExtra("responseTelegram");
+                ExtraReconnectKscat trData = new ExtraReconnectKscat();
+                trData.SetData(recvByte);
 
-              intent.putExtra("transactionCode", new String(trData.transactionCode));
-              intent.putExtra("resultCode", resultCode);
-              PluginResult result = new PluginResult(PluginResult.Status.OK, getIntentJson(intent));
-              result.setKeepCallback(true);
-              onActivityResultCallbackContext.sendPluginResult(result);
+                intent.putExtra("transactionCode", new String(trData.transactionCode));
+                intent.putExtra("resultCode", resultCode);
+                intent.putExtra("version", "1.2.0");
+                intent.putExtra("package_name", "com.elb.payment2");
+                PluginResult result = new PluginResult(PluginResult.Status.OK, getIntentJson(intent));
+                result.setKeepCallback(true);
+                onActivityResultCallbackContext.sendPluginResult(result);
             }
 
             // 결제 응답
-            else if((resultCode == RESULT_OK || resultCode == RESULT_CANCELED) && intent != null && intent.hasExtra("responseTelegram"))
-            {
-              byte[] recvByte = intent.getByteArrayExtra("responseTelegram");
-              TransactionData trData = new TransactionData();
-              trData.SetData(recvByte);
+            else if ((resultCode == RESULT_OK || resultCode == RESULT_CANCELED) && intent != null && intent.hasExtra("responseTelegram")) {
+                byte[] recvByte = intent.getByteArrayExtra("responseTelegram");
+                TransactionData trData = new TransactionData();
+                trData.SetData(recvByte);
 
 //              if(trData.transactionCode != null && !isEmpty(trData.transactionCode)){
-              intent.putExtra("transactionCode", new String(trData.transactionCode));
+                intent.putExtra("transactionCode", new String(trData.transactionCode));
 //              }
 //              if(trData.operationCode != null && !isEmpty(trData.operationCode)){
-              intent.putExtra("operationCode", new String(trData.operationCode));
+                intent.putExtra("operationCode", new String(trData.operationCode));
 //               }
 //              if(trData.transferCode != null && !isEmpty(trData.transferCode)){
-              intent.putExtra("transferCode", new String(trData.transferCode));
+                intent.putExtra("transferCode", new String(trData.transferCode));
 //               }
 //              if(trData.transferType != null && !isEmpty(trData.transferType)){
-              intent.putExtra("transferType", new String(trData.transferType));
+                intent.putExtra("transferType", new String(trData.transferType));
 //               }
 //              if(trData.deviceNumber != null && !isEmpty(trData.deviceNumber)){
-              intent.putExtra("deviceNumber", new String(trData.deviceNumber));
+                intent.putExtra("deviceNumber", new String(trData.deviceNumber));
 //               }
 //              if(trData.companyInfo != null && !isEmpty(trData.companyInfo)){
-              intent.putExtra("companyInfo", new String(trData.companyInfo));
+                intent.putExtra("companyInfo", new String(trData.companyInfo));
 //               }
 //              if(trData.transferSerialNumber != null && !isEmpty(trData.transferSerialNumber)){
-              intent.putExtra("transferSerialNumber", new String(trData.transferSerialNumber));
+                intent.putExtra("transferSerialNumber", new String(trData.transferSerialNumber));
 //               }
 //              if(trData.status != null && !isEmpty(trData.status)){
-              intent.putExtra("status", new String(trData.status));
+                intent.putExtra("status", new String(trData.status));
 //               }
 //              if(trData.standardCode != null && !isEmpty(trData.standardCode)){
-              intent.putExtra("standardCode", new String(trData.standardCode));
+                intent.putExtra("standardCode", new String(trData.standardCode));
 //               }
 //              if(trData.cardCompanyCode != null && !isEmpty(trData.cardCompanyCode)){
-              intent.putExtra("cardCompanyCode", new String(trData.cardCompanyCode));
+                intent.putExtra("cardCompanyCode", new String(trData.cardCompanyCode));
 //               }
 //              if(trData.transferDate != null && !isEmpty(trData.transferDate)){
-              intent.putExtra("transferDate", new String(trData.transferDate));
+                intent.putExtra("transferDate", new String(trData.transferDate));
 //               }
 //              if(trData.cardType != null && !isEmpty(trData.cardType)){
-              intent.putExtra("cardType", new String(trData.cardType));
+                intent.putExtra("cardType", new String(trData.cardType));
 //               }
 //              if(trData.approvalNumber != null && !isEmpty(trData.approvalNumber)){
-              intent.putExtra("approvalNumber", new String(trData.approvalNumber));
+                intent.putExtra("approvalNumber", new String(trData.approvalNumber));
 //               }
 //              if(trData.transactionUniqueNumber != null && !isEmpty(trData.transactionUniqueNumber)){
-              intent.putExtra("transactionUniqueNumber", new String(trData.transactionUniqueNumber));
+                intent.putExtra("transactionUniqueNumber", new String(trData.transactionUniqueNumber));
 //               }
 //              if(trData.merchantNumber != null && !isEmpty(trData.merchantNumber)){
-              intent.putExtra("merchantNumber", new String(trData.merchantNumber));
+                intent.putExtra("merchantNumber", new String(trData.merchantNumber));
 //               }
 //              if(trData.IssuanceCode != null && !isEmpty(trData.IssuanceCode)){
-              intent.putExtra("IssuanceCode", new String(trData.IssuanceCode));
+                intent.putExtra("IssuanceCode", new String(trData.IssuanceCode));
 //               }
 //              if(trData.purchaseCompanyCode != null && !isEmpty(trData.purchaseCompanyCode)){
-              intent.putExtra("purchaseCompanyCode", new String(trData.purchaseCompanyCode));
+                intent.putExtra("purchaseCompanyCode", new String(trData.purchaseCompanyCode));
 //               }
 //              if(trData.workingKeyIndex != null && !isEmpty(trData.workingKeyIndex)){
-              intent.putExtra("workingKeyIndex", new String(trData.workingKeyIndex));
+                intent.putExtra("workingKeyIndex", new String(trData.workingKeyIndex));
 //               }
 //              if(trData.workingKey != null && !isEmpty(trData.workingKey)){
-              intent.putExtra("workingKey", new String(trData.workingKey));
+                intent.putExtra("workingKey", new String(trData.workingKey));
 //               }
 //              if(trData.balance != null && !isEmpty(trData.balance)){
-              intent.putExtra("balance", new String(trData.balance));
+                intent.putExtra("balance", new String(trData.balance));
 //               }
 //              if(trData.point1 != null && !isEmpty(trData.point1)){
-              intent.putExtra("point1", new String(trData.point1));
+                intent.putExtra("point1", new String(trData.point1));
 //               }
 //              if(trData.point2 != null && !isEmpty(trData.point2)){
-              intent.putExtra("point2", new String(trData.point2));
+                intent.putExtra("point2", new String(trData.point2));
 //               }
 //              if(trData.point3 != null && !isEmpty(trData.point3)){
-              intent.putExtra("point3", new String(trData.point3));
+                intent.putExtra("point3", new String(trData.point3));
 //               }
-              try {
+                try {
 //              if(trData.purchaseCompanyName != null && !isEmpty(trData.purchaseCompanyName)){
-                intent.putExtra("purchaseCompanyName", new String(trData.purchaseCompanyName,"EUC-KR"));
+                    intent.putExtra("purchaseCompanyName", new String(trData.purchaseCompanyName, "EUC-KR"));
 //               }
 //              if(trData.cardCategoryName != null && !isEmpty(trData.cardCategoryName)){
-                intent.putExtra("cardCategoryName", new String(trData.cardCategoryName,"EUC-KR"));
+                    intent.putExtra("cardCategoryName", new String(trData.cardCategoryName, "EUC-KR"));
 //               }
 //              if(trData.message1 != null && !isEmpty(trData.message1)){
-                intent.putExtra("message1", new String(trData.message1,"EUC-KR"));
+                    intent.putExtra("message1", new String(trData.message1, "EUC-KR"));
 //               }
 //              if(trData.message2 != null && !isEmpty(trData.message2)){
-                intent.putExtra("message2", new String(trData.message2,"EUC-KR"));
+                    intent.putExtra("message2", new String(trData.message2, "EUC-KR"));
 //               }
 //              if(trData.notice2 != null && !isEmpty(trData.notice2)){
-                intent.putExtra("notice2", new String(trData.notice2,"EUC-KR"));
+                    intent.putExtra("notice2", new String(trData.notice2, "EUC-KR"));
 //               }
 //              if(trData.notice1 != null && !isEmpty(trData.notice1)){
-                intent.putExtra("notice1", new String(trData.notice1, "EUC-KR"));
+                    intent.putExtra("notice1", new String(trData.notice1, "EUC-KR"));
 //               }
-              } catch (UnsupportedEncodingException e) {
+                } catch (UnsupportedEncodingException e) {
 //                 throw new RuntimeException(e);
-              }
+                }
 //              if(trData.reserved != null && !isEmpty(trData.reserved)){
-              intent.putExtra("reserved", new String(trData.reserved));
+                intent.putExtra("reserved", new String(trData.reserved));
 //               }
 //              if(trData.KSNETreserved != null && !isEmpty(trData.KSNETreserved)){
-              intent.putExtra("KSNETreserved", new String(trData.KSNETreserved));
+                intent.putExtra("KSNETreserved", new String(trData.KSNETreserved));
 //               }
 //              if(trData.filler != null && !isEmpty(trData.filler)){
-              intent.putExtra("filler", new String(trData.filler));
+                intent.putExtra("filler", new String(trData.filler));
 //               }
 
-              intent.putExtra("resultCode", resultCode);
-              PluginResult result = new PluginResult(PluginResult.Status.OK, getIntentJson(intent));
-              result.setKeepCallback(true);
-              onActivityResultCallbackContext.sendPluginResult(result);
+                intent.putExtra("resultCode", resultCode);
+                PluginResult result = new PluginResult(PluginResult.Status.OK, getIntentJson(intent));
+                result.setKeepCallback(true);
+                onActivityResultCallbackContext.sendPluginResult(result);
+            } else {
+                intent.putExtra("requestCode", requestCode);
+                intent.putExtra("resultCode", resultCode);
+                PluginResult result = new PluginResult(PluginResult.Status.OK, getIntentJson(intent));
+                result.setKeepCallback(true);
+                onActivityResultCallbackContext.sendPluginResult(result);
             }
-            else
-            {
-            intent.putExtra("requestCode", requestCode);
-            intent.putExtra("resultCode", resultCode);
-            PluginResult result = new PluginResult(PluginResult.Status.OK, getIntentJson(intent));
-            result.setKeepCallback(true);
-            onActivityResultCallbackContext.sendPluginResult(result);
-            }
-        }
-        else if (onActivityResultCallbackContext != null)
-        {
+        } else if (onActivityResultCallbackContext != null) {
             Intent canceledIntent = new Intent();
             canceledIntent.putExtra("requestCode", requestCode);
             canceledIntent.putExtra("resultCode", resultCode);
@@ -1002,8 +971,7 @@ public class IntentShim extends CordovaPlugin {
             public void onReceive(Context context, Intent intent) {
                 String action = intent.getAction();
                 CallbackContext onBroadcastCallbackContext = receiverCallbacks.get(this);
-                if (onBroadcastCallbackContext != null)
-                {
+                if (onBroadcastCallbackContext != null) {
                     PluginResult result = new PluginResult(PluginResult.Status.OK, getIntentJson(intent));
                     result.setKeepCallback(true);
                     onBroadcastCallbackContext.sendPluginResult(result);
@@ -1026,8 +994,7 @@ public class IntentShim extends CordovaPlugin {
     /**
      * Return JSON representation of intent attributes
      *
-     * @param intent
-     * Credit: https://github.com/napolitano/cordova-plugin-intent
+     * @param intent Credit: https://github.com/napolitano/cordova-plugin-intent
      */
     private JSONObject getIntentJson(Intent intent) {
         JSONObject intentJSON = null;
@@ -1126,8 +1093,8 @@ public class IntentShim extends CordovaPlugin {
                 result.put(i, toJsonValue(Array.get(value, i)));
             }
             return result;
-        }else if (value instanceof ArrayList<?>) {
-            final ArrayList arrayList = (ArrayList<?>)value;
+        } else if (value instanceof ArrayList<?>) {
+            final ArrayList arrayList = (ArrayList<?>) value;
             final JSONArray result = new JSONArray();
             for (int i = 0; i < arrayList.size(); i++)
                 result.put(toJsonValue(arrayList.get(i)));
@@ -1202,7 +1169,7 @@ public class IntentShim extends CordovaPlugin {
         try {
             Iterator<?> keys = obj.keys();
             while (keys.hasNext()) {
-                String key = (String)keys.next();
+                String key = (String) keys.next();
 
                 if (obj.get(key) instanceof String)
                     returnBundle.putString(key, obj.getString(key));
@@ -1214,20 +1181,16 @@ public class IntentShim extends CordovaPlugin {
                     returnBundle.putLong(key, obj.getLong(key));
                 else if (obj.get(key) instanceof Double)
                     returnBundle.putDouble(key, obj.getDouble(key));
-                else if (obj.get(key).getClass().isArray() || obj.get(key) instanceof JSONArray)
-                {
+                else if (obj.get(key).getClass().isArray() || obj.get(key) instanceof JSONArray) {
                     JSONArray jsonArray = obj.getJSONArray(key);
                     int length = jsonArray.length();
-                    if (jsonArray.get(0) instanceof String)
-                    {
+                    if (jsonArray.get(0) instanceof String) {
                         String[] stringArray = new String[length];
                         for (int j = 0; j < length; j++)
                             stringArray[j] = jsonArray.getString(j);
                         returnBundle.putStringArray(key, stringArray);
                         //returnBundle.putParcelableArray(key, obj.get);
-                    }
-                    else
-                    {
+                    } else {
                         if (key.equals("PLUGIN_CONFIG")) {
                             ArrayList<Bundle> bundleArray = new ArrayList<Bundle>();
                             for (int k = 0; k < length; k++) {
@@ -1241,12 +1204,10 @@ public class IntentShim extends CordovaPlugin {
                             returnBundle.putParcelableArray(key, bundleArray);
                         }
                     }
-                }
-                else if (obj.get(key) instanceof JSONObject)
-                    returnBundle.putBundle(key, toBundle((JSONObject)obj.get(key)));
+                } else if (obj.get(key) instanceof JSONObject)
+                    returnBundle.putBundle(key, toBundle((JSONObject) obj.get(key)));
             }
-        }
-        catch (JSONException e) {
+        } catch (JSONException e) {
             e.printStackTrace();
         }
 

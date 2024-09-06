@@ -1,12 +1,12 @@
 <?xml version='1.0' encoding='utf-8'?>
-<plugin id="com-elb-cordova-plugin-kscat" version="1.1.1" xmlns="http://apache.org/cordova/ns/plugins/1.0" xmlns:android="http://schemas.android.com/apk/res/android">
+<plugin id="com-elb-cordova-plugin-kscat" version="1.2.0" xmlns="http://apache.org/cordova/ns/plugins/1.0" xmlns:android="http://schemas.android.com/apk/res/android">
     <name>Intent Shim</name>
     <js-module name="IntentShim" src="www/IntentShim.js">
         <clobbers target="intentShim" />
     </js-module>
-    
+
     <hook type="after_prepare" src="hooks/after_prepare.js" />
-	
+
 	<!-- android -->
     <platform name="android">
         <config-file target="res/xml/config.xml" parent="/*">
@@ -45,5 +45,5 @@
 		<resource-file src="src/android/res/xml/provider_paths.xml" target="res/xml/provider_paths.xml"/>
 		<framework src="androidx.core:core:1.1.0" />
     </platform>
-	
+
 </plugin>
