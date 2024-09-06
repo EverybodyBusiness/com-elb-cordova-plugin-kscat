@@ -1,24 +1,23 @@
 {
-  "name": "com-elb-cordova-plugin-kscat",
-  "version": "1.2.0",
-  "description": "ELB KSCAT credit card cordova plugin",
+  "name": "com-darryncampbell-cordova-plugin-intent",
+  "version": "2.2.0",
+  "description": "General purpose intent shim layer for cordova appliations on Android.  Handles various techniques for sending and receiving intents.",
+  "main": "intentShim.js",
   "cordova": {
-    "id": "com-elb-cordova-plugin-kscat",
+    "id": "com-darryncampbell-cordova-plugin-intent",
     "platforms": [
       "android"
     ]
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/EverybodyBusiness/com-elb-cordova-plugin-kscat.git"
+    "url": "https://github.com/EverybodyBusiness/darryncampbell-elb.git"
   },
   "keywords": [
-    "elb"
+    "ecosystem:cordova",
+    "cordova-android",
+    "Intent"
   ],
-  "author": "ELB",
-  "license": "Apache-2",
-  "bugs": {
-    "url": "https://github.com/EverybodyBusiness/com-elb-cordova-plugin-kscat/issues"
-  },
-  "homepage": "https://github.com/EverybodyBusiness/com-elb-cordova-plugin-kscat#readme"
+  "author": "Darryn Campbell",
+  "license": "MIT"
 }
