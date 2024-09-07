@@ -651,7 +651,7 @@ public class IntentShim extends CordovaPlugin {
 //     private Intent getElbKscatVer(JSONObject obj, CallbackContext callbackContext) throws JSONException {
 //             HashMap<String, String> hashMap = new HashMap<>();
 //             Intent intent = null;
-//             String verStr = String.valueOf("1.2.0");
+//             String verStr = String.valueOf("1.2.3");
 //
 //             intent = new Intent(Intent.ACTION_MAIN);
 //             intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
@@ -830,7 +830,7 @@ public class IntentShim extends CordovaPlugin {
 
                 intent.putExtra("transactionCode", new String(trData.transactionCode));
                 intent.putExtra("resultCode", resultCode);
-                intent.putExtra("version", "1.2.1");
+                intent.putExtra("version", "1.2.3");
                 intent.putExtra("package_name", "com.elb.payment2");
                 PluginResult result = new PluginResult(PluginResult.Status.OK, getIntentJson(intent));
                 result.setKeepCallback(true);
