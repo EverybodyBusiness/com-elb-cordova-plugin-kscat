@@ -16,7 +16,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: '16'  # 사용하고자 하는 Node.js 버전
+          node-version: '18'  # 사용하고자 하는 Node.js 버전
           registry-url: 'https://registry.npmjs.org'
 
       - name: Install dependencies
