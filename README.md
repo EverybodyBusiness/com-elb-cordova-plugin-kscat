@@ -37,3 +37,5 @@ npm version major는 메이저 버전을 증가시킵니다. (예: 1.0.0 → 2.0
 https://chatgpt.com/c/66dbb2f5-3f60-8010-aa15-dc213a6bcc2d
 git push origin --tags
 npm publish
+
+npm publish --access public

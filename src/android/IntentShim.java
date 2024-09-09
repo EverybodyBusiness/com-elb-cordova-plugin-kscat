@@ -566,19 +566,26 @@ public class IntentShim extends CordovaPlugin {
     }
 
     private void startActivity(Intent i, boolean bExpectResult, int requestCode, CallbackContext callbackContext) {
+        Log.d(LOG_TAG, "kalen startActivity called 1");
 
         if (i.resolveActivityInfo(this.cordova.getActivity().getPackageManager(), 0) != null) {
+            Log.d(LOG_TAG, "kalen startActivity called 2");
             if (bExpectResult) {
+                Log.d(LOG_TAG, "kalen startActivity called 3");
                 cordova.setActivityResultCallback(this);
                 this.cordova.getActivity().startActivityForResult(i, requestCode);
             } else {
+                Log.d(LOG_TAG, "kalen startActivity called 4");
                 this.cordova.getActivity().startActivity(i);
                 callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK));
             }
+            Log.d(LOG_TAG, "kalen startActivity called 5");
         } else {
             //  Return an error as there is no app to handle this intent
+            Log.d(LOG_TAG, "kalen startActivity called 6");
             callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.ERROR));
         }
+        Log.d(LOG_TAG, "kalen startActivity called 7");
     }
 
     private void sendBroadcast(Intent intent) {
@@ -650,19 +657,6 @@ public class IntentShim extends CordovaPlugin {
         return intent;
     }
 
-    private Intent getElbKscatVer() throws JSONException {
-        HashMap<String, String> hashMap = new HashMap<>();
-        Intent intent = null;
-        String kscat_ver = String.valueOf("1.2.11");
-
-        intent = new Intent(Intent.ACTION_MAIN);
-        intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
-        intent.addCategory(Intent.CATEGORY_LAUNCHER);
-        intent.putExtra("elb_kscat_ver", kscat_ver);
-
-        return intent;
-    }
-
     private Intent populateIntent(JSONObject obj, CallbackContext callbackContext) throws JSONException {
         // payment 결제
         Log.d(LOG_TAG, "kalen populateIntent called");
@@ -673,11 +667,6 @@ public class IntentShim extends CordovaPlugin {
         // 단말기 재연결
         if (obj.has("package") && obj.getString("package").equals("com.elb.payment2.reconnect_kscat")) {
             return this.populateReconnectKscatIntent(obj, callbackContext);
-        }
-
-        // 현재 플러그인의 ver
-        if (obj.has("package") && obj.getString("package").equals("com.elb.payment2.get_elb_kscat_ver")) {
-            return this.getElbKscatVer();
         }
 
         //  Credit: https://github.com/chrisekelley/cordova-webintent
@@ -833,16 +822,7 @@ public class IntentShim extends CordovaPlugin {
 
                 intent.putExtra("transactionCode", new String(trData.transactionCode));
                 intent.putExtra("resultCode", resultCode);
-                intent.putExtra("version", "1.2.11");
-                intent.putExtra("package_name", "com.elb.payment2");
-                PluginResult result = new PluginResult(PluginResult.Status.OK, getIntentJson(intent));
-                result.setKeepCallback(true);
-                onActivityResultCallbackContext.sendPluginResult(result);
-            }
-            // 버전 정보
-            else if (requestCode == 1000) {
-                intent.putExtra("resultCode", "-1");
-                intent.putExtra("version", "1.2.11");
+                intent.putExtra("version", "1.2.12");
                 intent.putExtra("package_name", "com.elb.payment2");
                 PluginResult result = new PluginResult(PluginResult.Status.OK, getIntentJson(intent));
                 result.setKeepCallback(true);
