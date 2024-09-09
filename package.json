@@ -1,6 +1,6 @@
 {
-  "name": "@bookingtong/kscat",
-  "version": "1.2.14",
+  "name": "@bookingtong/kscat2",
+  "version": "1.2.15",
   "description": "for payment kiosk personal",
   "main": "index.js",
   "scripts": {
