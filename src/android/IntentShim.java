@@ -597,7 +597,7 @@ public class IntentShim extends CordovaPlugin {
         Log.d(LOG_TAG, "kalen populateKsnetIntent merchant_uid" + obj.getString("merchant_uid"));
 
 
-        Log.d(LOG_TAG, "kalen 결제");
+        Log.d(LOG_TAG, "kalen makeTelegramIC");
         makeTelegramIC(obj.getString("tid"),
                 obj.getString("installment"),
                 obj.getString("totalAmount"),
@@ -606,6 +606,7 @@ public class IntentShim extends CordovaPlugin {
                 obj.getString("sign"),
                 obj.getString("merchant_uid"));
         // makeTelegramVANTR();
+        Log.d(LOG_TAG, "kalen ComponentName 1");
         ComponentName componentName = new ComponentName("com.ksnet.kscat_a", "com.ksnet.kscat_a.PaymentIntentActivity");
         intent = new Intent(Intent.ACTION_MAIN);
         intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
@@ -614,6 +615,7 @@ public class IntentShim extends CordovaPlugin {
         intent.putExtra("Telegram", mRequestTelegram);
         intent.putExtra("TelegramLength", mRequestTelegram.length);
 
+        Log.d(LOG_TAG, "kalen ComponentName 2");
         String mRequestTelegramString = new String(mRequestTelegram);
         Log.d(LOG_TAG, "mRequestTelegram as String: " + mRequestTelegramString);
 
@@ -648,23 +650,24 @@ public class IntentShim extends CordovaPlugin {
         return intent;
     }
 
-//     private Intent getElbKscatVer(JSONObject obj, CallbackContext callbackContext) throws JSONException {
-//             HashMap<String, String> hashMap = new HashMap<>();
-//             Intent intent = null;
-//             String verStr = String.valueOf("1.2.4");
-//
-//             intent = new Intent(Intent.ACTION_MAIN);
-//             intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
-//             intent.addCategory(Intent.CATEGORY_LAUNCHER);
-//             intent.putExtra("elb_kscat_ver", verStr);
-//
-//             return intent;
-//         }
+    private Intent getElbKscatVer() throws JSONException {
+        HashMap<String, String> hashMap = new HashMap<>();
+        Intent intent = null;
+        String kscat_ver = String.valueOf("1.2.11");
+
+        intent = new Intent(Intent.ACTION_MAIN);
+        intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        intent.addCategory(Intent.CATEGORY_LAUNCHER);
+        intent.putExtra("elb_kscat_ver", kscat_ver);
+
+        return intent;
+    }
 
     private Intent populateIntent(JSONObject obj, CallbackContext callbackContext) throws JSONException {
         // payment 결제
+        Log.d(LOG_TAG, "kalen populateIntent called");
         if (obj.has("package") && obj.getString("package").equals("com.elb.payment2")) {
-            return this.populateKsnetIntent(obj, callbackContext);
+            return this.populateKsnetIntent(obj, callbackContext);      // return intent
         }
 
         // 단말기 재연결
@@ -673,9 +676,9 @@ public class IntentShim extends CordovaPlugin {
         }
 
         // 현재 플러그인의 ver
-//         if (obj.has("package") && obj.getString("package").equals("com.elb.payment2.get_elb_kscat_ver")) {
-//             return this.getElbKscatVer(obj, callbackContext);
-//         }
+        if (obj.has("package") && obj.getString("package").equals("com.elb.payment2.get_elb_kscat_ver")) {
+            return this.getElbKscatVer();
+        }
 
         //  Credit: https://github.com/chrisekelley/cordova-webintent
         String type = obj.has("type") ? obj.getString("type") : null;
@@ -830,13 +833,21 @@ public class IntentShim extends CordovaPlugin {
 
                 intent.putExtra("transactionCode", new String(trData.transactionCode));
                 intent.putExtra("resultCode", resultCode);
-                intent.putExtra("version", "1.2.8");
+                intent.putExtra("version", "1.2.11");
                 intent.putExtra("package_name", "com.elb.payment2");
                 PluginResult result = new PluginResult(PluginResult.Status.OK, getIntentJson(intent));
                 result.setKeepCallback(true);
                 onActivityResultCallbackContext.sendPluginResult(result);
             }
-
+            // 버전 정보
+            else if (requestCode == 1000) {
+                intent.putExtra("resultCode", "-1");
+                intent.putExtra("version", "1.2.11");
+                intent.putExtra("package_name", "com.elb.payment2");
+                PluginResult result = new PluginResult(PluginResult.Status.OK, getIntentJson(intent));
+                result.setKeepCallback(true);
+                onActivityResultCallbackContext.sendPluginResult(result);
+            }
             // 결제 응답
             else if ((resultCode == RESULT_OK || resultCode == RESULT_CANCELED) && intent != null && intent.hasExtra("responseTelegram")) {
                 byte[] recvByte = intent.getByteArrayExtra("responseTelegram");
