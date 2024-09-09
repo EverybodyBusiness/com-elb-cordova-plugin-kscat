@@ -571,7 +571,7 @@ public class IntentShim extends CordovaPlugin {
         if (i.resolveActivityInfo(this.cordova.getActivity().getPackageManager(), 0) != null) {
             Log.d(LOG_TAG, "kalen startActivity called 2");
             if (bExpectResult) {
-                Log.d(LOG_TAG, "kalen startActivity called 3");
+                Log.d(LOG_TAG, "kalen startActivity called 3");         // <== called everytime 정상 호출되는 경우
                 cordova.setActivityResultCallback(this);
                 this.cordova.getActivity().startActivityForResult(i, requestCode);
             } else {
@@ -601,7 +601,7 @@ public class IntentShim extends CordovaPlugin {
         Intent intent = null;
         Log.d(LOG_TAG, "kalen populateKsnetIntent !!!");
         Log.d(LOG_TAG, "kalen populateKsnetIntent " + obj.toString());
-        Log.d(LOG_TAG, "kalen populateKsnetIntent merchant_uid" + obj.getString("merchant_uid"));
+        Log.d(LOG_TAG, "kalen populateKsnetIntent merchant_uid " + obj.getString("merchant_uid"));
 
 
         Log.d(LOG_TAG, "kalen makeTelegramIC");
