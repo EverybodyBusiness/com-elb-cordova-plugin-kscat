@@ -5,8 +5,6 @@
         <clobbers target="intentShim" />
     </js-module>
 
-    <hook type="after_prepare" src="hooks/after_prepare.js" />
-
     <!-- android -->
     <platform name="android">
         <config-file target="res/xml/config.xml" parent="/*">
