@@ -660,12 +660,12 @@ public class IntentShim extends CordovaPlugin {
     private Intent populateIntent(JSONObject obj, CallbackContext callbackContext) throws JSONException {
         // payment 결제
         Log.d(LOG_TAG, "kalen populateIntent called");
-        if (obj.has("package") && obj.getString("package").equals("com.elb.payment2")) {
+        if (obj.has("package") && obj.getString("package").equals("com.elb.payment")) {
             return this.populateKsnetIntent(obj, callbackContext);      // return intent
         }
 
         // 단말기 재연결
-        if (obj.has("package") && obj.getString("package").equals("com.elb.payment2.reconnect_kscat")) {
+        if (obj.has("package") && obj.getString("package").equals("com.elb.payment.reconnect_kscat")) {
             return this.populateReconnectKscatIntent(obj, callbackContext);
         }
 
@@ -822,8 +822,8 @@ public class IntentShim extends CordovaPlugin {
 
                 intent.putExtra("transactionCode", new String(trData.transactionCode));
                 intent.putExtra("resultCode", resultCode);
-                intent.putExtra("version", "1.2.13");
-                intent.putExtra("package_name", "com.elb.payment2");
+                intent.putExtra("version", "1.2.14");
+                intent.putExtra("package_name", "com.elb.payment");
                 PluginResult result = new PluginResult(PluginResult.Status.OK, getIntentJson(intent));
                 result.setKeepCallback(true);
                 onActivityResultCallbackContext.sendPluginResult(result);
