@@ -822,8 +822,8 @@ public class IntentShim extends CordovaPlugin {
 
                 intent.putExtra("transactionCode", new String(trData.transactionCode));
                 intent.putExtra("resultCode", resultCode);
-                intent.putExtra("version", "1.2.15");
-                intent.putExtra("package_name", "com.elb.payment");
+                intent.putExtra("version", "2.0.2");
+                intent.putExtra("name", "com.elb.payment");
                 PluginResult result = new PluginResult(PluginResult.Status.OK, getIntentJson(intent));
                 result.setKeepCallback(true);
                 onActivityResultCallbackContext.sendPluginResult(result);
